@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Memorias permanentes: M-ROM y PROM</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Instrument+Sans:wght@400;600&display=swap">
+<style>
+:root{--bg:#eef3ef;--fg:#0e2018;--mut:#4b6258;--card:#fff;--line:#c5d6cc;--acc:#8a5f00;--acc2:#0a7a55;--gold:#e3b341;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0a1a15;--fg:#e6efe9;--mut:#97b3a6;--card:#10261e;--line:#1f4034;--acc:#e3b341;--acc2:#5fd4a0}}
+:root[data-theme="dark"]{--bg:#0a1a15;--fg:#e6efe9;--mut:#97b3a6;--card:#10261e;--line:#1f4034;--acc:#e3b341;--acc2:#5fd4a0}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font:400 17px/1.6 "Instrument Sans",system-ui,sans-serif;overflow-x:hidden}
+h1,h2,h3{font-family:Unbounded,"Arial Black",sans-serif;font-weight:700;line-height:1.1;margin:0}
+#bar{position:fixed;top:env(safe-area-inset-top,0px);left:0;height:3px;width:100%;background:var(--gold);transform-origin:0 50%;transform:scaleX(0);z-index:9}
+#hero{height:280vh;position:relative;background:#06130f;color:#e6efe9}
+.stage{position:sticky;top:0;height:100vh;overflow:hidden;display:grid;place-items:center;perspective:1000px;background:radial-gradient(ellipse at 50% 60%,#0f3d2e 0,#06130f 70%)}
+.bits{position:absolute;inset:0;pointer-events:none}
+.bits i{animation:dr var(--d,12s) ease-in-out infinite alternate;position:absolute;font:500 14px/1.3 monospace;color:#2f7d5f;opacity:.55;writing-mode:vertical-rl;font-style:normal}
+.ttl{position:absolute;top:8vh;left:0;right:0;text-align:center;padding:0 20px;z-index:2}
+.ttl h1{font-size:clamp(2rem,6.5vw,4.6rem)}
+.ttl p{margin:.8rem auto 0;max-width:34ch;color:#9fc7b4;font-size:clamp(1rem,2.2vw,1.25rem)}
+#chip{width:min(82vw,560px);transform-style:preserve-3d;will-change:transform;filter:drop-shadow(0 30px 40px #000a)}
+#chip svg{width:100%;display:block}
+.hint{position:absolute;bottom:5vh;color:#9fc7b4;font-size:.95rem;z-index:2;transition:opacity .3s}
+.final{position:absolute;bottom:9vh;left:0;right:0;text-align:center;font-family:Unbounded,sans-serif;font-size:clamp(1rem,2.6vw,1.5rem);color:var(--gold);opacity:0;z-index:2}
+section.s{position:relative;padding:14vh 22px;overflow:hidden}
+.w{max-width:1000px;margin:0 auto;position:relative;z-index:1}
+.ghost{position:absolute;right:-4%;top:6%;width:min(60vw,520px);opacity:.14;color:var(--acc2);pointer-events:none;will-change:transform}
+h2{font-size:clamp(1.7rem,4.4vw,3rem);max-width:18ch}
+.t{display:inline-block;margin:0 0 1rem;padding:.2rem .7rem;border:1px solid var(--line);border-radius:99px;color:var(--mut);font-size:.85rem}
+.lead{font-size:1.2rem;max-width:56ch;color:var(--mut);margin:1.2rem 0 2rem}
+.g{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.c{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px}
+.c h3{font-size:1.05rem;margin-bottom:.6rem}.c p,.c li{color:var(--mut);margin:.3rem 0}.c ul{padding-left:1.1rem;margin:.4rem 0}
+.demo{margin-top:2rem;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px}
+.row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:.6rem 0}.row b{min-width:150px;font-weight:600}
+.by{display:inline-flex;gap:6px}.by span{width:34px;height:40px;display:grid;place-items:center;border-radius:8px;background:var(--bg);border:1px solid var(--line);font:600 18px monospace;transition:.5s}
+.by span.off{opacity:.15;color:var(--mut)}
+button{font:600 1rem "Instrument Sans",sans-serif;cursor:pointer;border:0;border-radius:99px;padding:.7rem 1.3rem;background:var(--acc);color:#0a1a15}
+:root:not([data-theme="dark"]) button{color:#fff}
+button:focus-visible{outline:3px solid var(--acc2);outline-offset:3px}
+.mask{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;max-width:420px;margin:1rem 0}
+.mask div{aspect-ratio:1;border-radius:8px;background:var(--bg);border:1px solid var(--line);position:relative;display:grid;place-items:center;font:600 14px monospace;color:var(--mut)}
+.mask div.m1::before{content:"";position:absolute;left:0;right:0;top:50%;height:6px;margin-top:-3px;background:var(--acc2);opacity:.85}
+.mask div span{position:relative;background:var(--bg);padding:0 3px;border-radius:4px}
+.fr{display:flex;gap:6px;align-items:center;margin:6px 0}
+.f{width:38px;height:38px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--acc2);font:600 16px monospace;padding:0;position:relative;transition:.25s}
+.f.x{background:#c2410c;color:#fff;border-color:#c2410c;transform:scale(.88);box-shadow:0 0 18px #ff8a3d}
+.f.x::after{content:"✦";position:absolute;top:-10px;right:-4px;animation:sp .6s forwards;color:var(--gold)}
+@keyframes sp{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-16px)}}
+.val{margin-left:10px;font:600 15px monospace;color:var(--mut)}
+.tw{overflow-x:auto;margin-top:1.6rem;border:1px solid var(--line);border-radius:14px;background:var(--card)}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:.95rem}
+th,td{padding:.7rem .9rem;text-align:left;border-bottom:1px solid var(--line)}th{font-weight:600}
+tr.hl td{background:color-mix(in srgb,var(--acc2) 14%,transparent);font-weight:600}
+.pc{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin-top:2rem}
+.big{font:700 clamp(1.4rem,3.4vw,2.2rem)/1.2 Unbounded,sans-serif;max-width:24ch}
+footer{padding:40px 22px;text-align:center;color:var(--mut);font-size:.9rem}
+@keyframes dr{to{translate:0 -9vh;opacity:.15}}
+#nv{position:fixed;right:14px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:14px;z-index:9}
+#nv a{width:10px;height:10px;border-radius:50%;border:2px solid var(--gold);transition:.3s}#nv a.on{background:var(--gold);transform:scale(1.4)}
+.mq{overflow:hidden;padding:4vh 0;white-space:nowrap;background:var(--bg)}
+.mq b{display:block;font:700 clamp(3rem,11vw,8rem)/1.05 Unbounded,sans-serif;color:transparent;-webkit-text-stroke:1.5px var(--acc2);margin-left:-8vw;will-change:transform}
+.sc{height:300vh;position:relative}#ex{height:380vh}#fs{height:460vh}.pin{position:sticky;top:0;height:100vh;display:grid;align-items:center;padding:0 22px;overflow:hidden;background:var(--bg)}
+.exg{display:grid;gap:30px;grid-template-columns:1fr 1fr;align-items:center}@media(max-width:760px){.exg{grid-template-columns:1fr}}
+.exs{perspective:1100px;display:grid;place-items:center;height:min(46vh,360px)}
+#exb{position:relative;width:min(70vw,330px);aspect-ratio:8/5;transform-style:preserve-3d}
+.ly{position:absolute;inset:0;border-radius:12px;border:2px solid var(--line);transition:opacity .3s,box-shadow .3s;font:700 22px Unbounded,sans-serif;display:grid;place-items:center}
+.ly.on{box-shadow:0 0 34px #5fd4a0aa}
+.l1{background:#1b2233;color:#e3b341;border-color:#3a4760}
+.l2{background:repeating-linear-gradient(90deg,transparent 0 70px,#0b2019 70px 100px),repeating-linear-gradient(0deg,#5fd4a0 0 5px,#0b2019 5px 22px)}
+.l3{background:radial-gradient(circle,#e3b341 0 3px,transparent 4px) 0 0/24px 24px,#10261e}
+.l4{background:linear-gradient(135deg,#27405f,#0e1a2c)}
+#exl{list-style:none;padding:0;margin:1.2rem 0 0}#exl li{padding:.6rem 0 .6rem 16px;border-left:3px solid var(--line);color:var(--mut);transition:.3s}#exl li.on{border-color:var(--gold);color:var(--fg);transform:translateX(8px)}
+.sv{font:600 18px "Instrument Sans",sans-serif;fill:var(--mut)}
+.dt{display:block;max-height:0;overflow:hidden;opacity:0;transition:.4s;font-size:.95rem}#exl li.on .dt{max-height:8em;opacity:1;margin-top:.3rem}#exh{transition:opacity .3s}
+#fc{min-height:6.8em}
+.ad{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:1rem}#sw{display:inline-flex;gap:8px}
+.sb{width:46px;height:46px;border-radius:10px;background:var(--bg);color:var(--acc2)!important;border:1px solid var(--line);font:600 18px monospace;padding:0}.sb.on{background:var(--acc2);color:var(--bg)!important}
+.rr{display:grid;grid-template-columns:50px 1fr 30px;gap:10px;font:600 15px monospace;padding:6px 10px;border-radius:8px;color:var(--mut);transition:.25s}.rr.on{background:var(--acc2);color:var(--bg);transform:translateX(10px)}.rr i,.rr em{font-style:normal}.rr em{text-align:center}
+.st b{display:block;font:700 clamp(1.5rem,3.2vw,2.2rem)/1.1 Unbounded,sans-serif;color:var(--acc);margin-bottom:.5rem}
+.fl{all:unset;display:block;cursor:pointer;perspective:800px;height:190px}.fl .fi{position:relative;display:block;height:100%;transform-style:preserve-3d;transition:transform .6s}.fl[aria-pressed=true] .fi{transform:rotateY(180deg)}.fl:focus-visible .fi{outline:3px solid var(--acc2);border-radius:14px}
+.fi span{position:absolute;inset:0;backface-visibility:hidden;display:grid;place-items:center;text-align:center;padding:22px;border-radius:14px;border:1px solid var(--line);font:700 1.05rem/1.3 Unbounded,sans-serif;background:var(--card);color:var(--fg)}.fi .fk{transform:rotateY(180deg);background:var(--acc2);color:var(--bg);font:600 1rem/1.4 "Instrument Sans",sans-serif}
+#sb2 button.sel{box-shadow:0 0 0 3px var(--acc2)}#fc b{color:var(--fg)}#fdt{display:flex;gap:8px;justify-content:center;margin-top:1rem}#fdt i{width:34px;height:5px;border-radius:3px;background:var(--line);transition:.3s}#fdt i.on{background:var(--gold)}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.f.x::after{animation:none;opacity:0}.bits i{animation:none}}
+</style></head><body>
+<div id="bar"></div><nav id="nv" aria-label="Secciones"></nav>
+
+<header id="hero"><div class="stage">
+ <div class="bits" id="bits"></div>
+ <div class="ttl"><h1>Memorias permanentes</h1><p>M-ROM y PROM: datos que siguen ahí cuando se apaga la energía.</p></div>
+ <div id="chip"><svg viewBox="0 0 400 260" role="img" aria-label="Chip de memoria con pines dorados">
+  <defs><linearGradient id="gd" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2a3446"/><stop offset="1" stop-color="#0d121c"/></linearGradient>
+  <pattern id="gr" width="14" height="14" patternUnits="userSpaceOnUse"><path d="M14 0H0V14" fill="none" stroke="#5fd4a0" stroke-opacity=".25"/></pattern></defs>
+  <g stroke="#e3b341" stroke-width="7" stroke-dasharray="14 12">
+   <line x1="0" y1="52" x2="60" y2="52" stroke-dasharray="0"/><line x1="0" y1="52" x2="60" y2="52" style="display:none"/>
+   <path d="M2 40V220M398 40V220" stroke="none"/></g>
+  <g fill="#e3b341"><g id="pn"></g></g>
+  <rect x="50" y="22" width="300" height="216" rx="14" fill="url(#gd)" stroke="#3a4760" stroke-width="2"/>
+  <circle cx="74" cy="46" r="7" fill="#06130f" stroke="#3a4760"/>
+  <rect x="100" y="70" width="200" height="110" rx="6" fill="url(#gr)" stroke="#5fd4a0" stroke-opacity=".5"/>
+  <text x="200" y="132" text-anchor="middle" fill="#e3b341" font-family="Unbounded,sans-serif" font-weight="700" font-size="26">M-ROM · PROM</text>
+  <text x="200" y="210" text-anchor="middle" fill="#97b3a6" font-family="monospace" font-size="13">NO VOLÁTIL · SOLO LECTURA</text>
+ </svg></div>
+ <div class="hint" id="hint">Desliza para explorar</div>
+ <div class="final" id="fin">Información fija, lista al encender.</div>
+</div></header>
+
+<section class="s" id="def"><svg class="ghost" data-s=".12" viewBox="0 0 200 120"><path d="M0 20H80V60H140V100H200M0 60H40V100H100M60 0V40H120" fill="none" stroke="currentColor" stroke-width="3"/></svg>
+<div class="w"><span class="t">Definición</span>
+<h2>¿Qué es una memoria permanente?</h2>
+<p class="lead">Es una memoria de solo lectura (ROM): un circuito integrado programado con un contenido específico. Sus datos no se pierden aunque falte la fuente de alimentación.</p>
+<div class="g">
+<div class="c"><h3>No volátil</h3><p>Conserva la información sin energía, a diferencia de la RAM.</p></div>
+<div class="c"><h3>Inmodificable o casi</h3><p>Sus datos no se pueden cambiar, o exigen un proceso especial para hacerlo.</p></div>
+<div class="c"><h3>Filas y columnas</h3><p>Es un arreglo direccionable donde cada celda guarda un 1 o un 0.</p></div>
+</div>
+<div class="demo"><b>Pruébalo: corta la energía</b>
+<div class="row"><b>RAM (volátil)</b><span class="by" id="rb"></span></div>
+<div class="row"><b>ROM (permanente)</b><span class="by" id="ob"></span></div>
+<button id="pw" aria-pressed="true">Cortar energía</button></div>
+</div></section>
+
+<div class="mq" aria-hidden="true"><b>M-ROM · PROM · M-ROM · PROM</b><b>Solo lectura · no volátil · solo lectura</b></div>
+<section class="s" id="mrom"><svg class="ghost" data-s="-.1" viewBox="0 0 200 120"><rect x="10" y="10" width="180" height="100" rx="8" fill="none" stroke="currentColor" stroke-width="3"/><path d="M30 40H170M30 60H120M30 80H150" stroke="currentColor" stroke-width="3"/></svg>
+<div class="w"><span class="t">M-ROM</span>
+<h2>M-ROM: grabada en la fábrica</h2>
+<p class="lead">También se llama ROM de máscara. El contenido se define durante la fabricación y ya no se puede alterar.</p>
+<div class="g">
+<div class="c"><h3>Cómo se programa</h3><p>Un 1 o un 0 se forma por la presencia o ausencia de una línea de aluminio. Esa plantilla la define una máscara litográfica usada en uno de los últimos pasos de fabricación.</p></div>
+<div class="c"><h3>Ventajas</h3><ul><li>Muy barata en grandes cantidades</li><li>Consume muy poca potencia</li><li>Muy confiable</li><li>No necesita pruebas ni programación posterior</li></ul></div>
+<div class="c"><h3>Desventajas</h3><ul><li>Fabricar la máscara es caro y laborioso</li><li>Si el código tiene un error, se tira la memoria y se empieza de nuevo</li></ul></div>
+</div>
+<div class="demo"><b>Así se ve la máscara: línea de aluminio = 1, sin línea = 0</b><div class="mask" id="mk"></div></div>
+</div></section>
+
+<div class="sc" id="ex"><div class="pin"><div class="w exg"><div><span class="t">Por dentro</span><h2>Las capas de una M-ROM</h2><ul id="exl"><li><b>Encapsulado.</b> Protege el chip.<span class="dt">Es la cubierta del circuito integrado: lo protege y deja los pines que lo conectan con el resto del equipo.</span></li><li><b>Líneas de aluminio.</b> La máscara: con línea es 1, sin línea es 0.<span class="dt">Esa plantilla de aluminio la define una máscara litográfica usada en uno de los últimos pasos de fabricación. Por eso se llama M-ROM, y por eso no se puede cambiar después.</span></li><li><b>Matriz de celdas.</b> Filas y columnas direccionables.<span class="dt">Cada celda contiene un 1 o un 0. Se lee eligiendo su fila y su columna, igual que en una RAM, pero aquí el contenido ya viene fijo.</span></li><li><b>Silicio.</b> La base del circuito.<span class="dt">Una vez fabricado el chip, su contenido queda fijo. Si el código tenía un error, la única solución es tirar la memoria y empezar de nuevo.</span></li></ul><p class="val" id="exh">Desliza: las capas se separan. Vista simplificada, solo ilustrativa.</p></div><div class="exs"><div id="exb"><div class="ly l1">M-ROM</div><div class="ly l2"></div><div class="ly l3"></div><div class="ly l4"></div></div></div></div></div></div>
+<section class="s" id="prom"><svg class="ghost" data-s=".1" viewBox="0 0 200 120"><path d="M10 60H70M130 60H190" stroke="currentColor" stroke-width="4"/><path d="M70 60Q85 30 100 60T130 60" fill="none" stroke="currentColor" stroke-width="4"/></svg>
+<div class="w"><span class="t">PROM</span>
+<h2>PROM: la programas tú, una sola vez</h2>
+<p class="lead">Nació porque hacer ROM para pocas unidades salía muy caro. Cualquiera la puede codificar con una herramienta llamada programador.</p>
+<div class="g">
+<div class="c"><h3>Fusible en cada celda</h3><p>En cada cruce de fila y columna hay un fusible. Al inicio (blank) todas las celdas valen 1.</p></div>
+<div class="c"><h3>Quemar la PROM</h3><p>Para escribir un 0, el programador envía un pulso de alto voltaje (de 10 a 30 V) que rompe el fusible de esa celda.</p></div>
+<div class="c"><h3>Sin marcha atrás</h3><p>Solo se programa una vez. Además es más frágil que una ROM: la electricidad estática puede quemar fusibles y cambiar bits de 1 a 0.</p></div>
+</div>
+<div class="demo"><b>Programa tu PROM: toca un fusible para quemarlo</b><div id="fg"></div>
+<p class="val" style="margin:.8rem 0">Un fusible quemado no se reconecta. El botón solo simula un chip nuevo.</p>
+<button id="rs">Chip nuevo en blanco</button></div>
+</div></section>
+
+<div class="sc" id="fs"><div class="pin"><div class="w" style="text-align:center"><span class="t">Dentro de una celda PROM</span><svg viewBox="0 0 800 300" style="width:100%;max-height:46vh" role="img" aria-label="Fusible de una celda PROM que se rompe al programarla"><text x="40" y="128" class="sv">Fila</text><text x="760" y="128" text-anchor="end" class="sv">Columna</text><path d="M40 150H330M470 150H760" style="stroke:var(--mut);stroke-width:6;fill:none;stroke-linecap:round"/><path id="cur" d="M40 150H760" style="stroke:var(--gold);stroke-width:6;fill:none;stroke-dasharray:14 22;opacity:0"/><path id="fz" d="M330 150L345 120L365 180L385 120L405 180L425 120L445 180L470 150" style="fill:none;stroke-width:6;stroke-linejoin:round;stroke:var(--mut);stroke-dasharray:6 6"/><g id="fb" style="opacity:0;fill:none;stroke:#e86a2a;stroke-width:6;stroke-linecap:round"><path d="M330 150L345 120L365 150"/><path d="M445 165L450 180L470 150"/></g><g id="sk" style="opacity:0;stroke:var(--gold);stroke-width:4;stroke-linecap:round"><path d="M395 130l-14-26M405 128l4-30M415 135l22-22M398 168l-18 20M412 168l20 18"/></g><text id="vt" x="400" y="80" text-anchor="middle" class="sv" style="opacity:0;fill:var(--gold)">Pulso de 10 a 30 V</text><text id="vn" x="400" y="282" text-anchor="middle" style="font:700 90px Unbounded,sans-serif;fill:var(--acc2)">1</text></svg><p id="fc" class="lead" style="margin:0 auto"></p><div id="fdt"><i></i><i></i><i></i><i></i><i></i></div></div></div></div>
+<section class="s" id="lee"><svg class="ghost" data-s=".1" viewBox="0 0 200 120"><path d="M10 20h60v80H10zM130 20h60v80h-60zM70 60h60" fill="none" stroke="currentColor" stroke-width="3"/></svg><div class="w"><span class="t">Cómo se lee</span><h2>Pon una dirección, recibe un dato</h2><p class="lead">Mueve los interruptores del bus de direcciones. El decodificador elige una fila y la memoria entrega su byte. Leer no borra nada.</p><div class="demo"><div class="ad"><b>Bus de direcciones</b><span id="sw"></span></div><div id="rw"></div><div class="row"><b>Bus de datos</b><span class="by" id="ro"></span></div></div></div></section>
+<section class="s" id="uso"><svg class="ghost" data-s=".12" viewBox="0 0 200 120"><circle cx="100" cy="60" r="44" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="100" cy="60" r="16" fill="currentColor"/></svg>
+<div class="w"><span class="t">Utilidades y ejemplos</span>
+<h2>¿Dónde las encontramos?</h2>
+<p class="lead">Guardan lo que no debe cambiar: programas y tablas fijas.</p>
+<div class="g">
+<div class="c"><h3>Arranque del computador</h3><p>El equipo carga datos desde la ROM y hace el POST. Luego carga el BIOS, que también viene de la ROM.</p></div>
+<div class="c"><h3>Electrodomésticos</h3><p>La ROM puede contener todo el programa que controla un dispositivo.</p></div>
+<div class="c"><h3>Tablas fijas</h3><p>Tablas de conversión, generadores de caracteres y funciones aritméticas complejas.</p></div>
+<div class="c"><h3>Microprogramas y sistemas</h3><p>Unidades de control microprogramadas y partes del sistema operativo.</p></div>
+<div class="c"><h3>Ejemplo M-ROM</h3><p>Un producto que se fabrica por miles con el mismo programa, como un electrodoméstico.</p></div>
+<div class="c"><h3>Ejemplo PROM</h3><p>Un equipo de producción pequeña o un prototipo con el programa ya definido, grabado una sola vez.</p></div>
+</div></div></section>
+
+<section class="s" id="dat"><svg class="ghost" data-s="-.12" viewBox="0 0 200 120"><circle cx="60" cy="60" r="40" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="130" cy="60" r="28" fill="none" stroke="currentColor" stroke-width="3"/></svg><div class="w"><span class="t">Datos clave</span><h2>Cuatro cifras para recordar</h2><div class="g" style="margin-top:2rem"><div class="c st"><b>10 a 30 V</b><p>Pulso que quema los fusibles de una PROM.</p></div><div class="c st"><b>1 vez</b><p>Lo que se puede programar una PROM.</p></div><div class="c st"><b>Céntimos</b><p>Lo que cuesta cada M-ROM al fabricarla en grandes cantidades.</p></div><div class="c st"><b>2 a 300 ns</b><p>Tiempo de acceso de las memorias integradas MOS.</p></div></div></div></section>
+<section class="s" id="cmp"><div class="w"><span class="t">Comparación</span>
+<h2>¿En qué se diferencian de otras memorias?</h2>
+<p class="lead">Las permanentes no se reescriben en el equipo. Las demás borran de varias formas, o pierden los datos al apagarse.</p>
+<svg id="tr" viewBox="0 0 820 310" style="width:100%;margin:2rem 0 0" role="img" aria-label="Árbol de tipos de memoria con las permanentes resaltadas"></svg>
+<div class="tw"><table><thead><tr><th>Memoria</th><th>Escritura</th><th>Borrado</th><th>Volátil</th><th>Aplicación típica</th></tr></thead><tbody>
+<tr class="hl"><td>M-ROM</td><td>Fabricante, con máscara</td><td>Imposible</td><td>No</td><td>Equipos de gran volumen</td></tr>
+<tr class="hl"><td>PROM</td><td>Usuario, una vez</td><td>Imposible</td><td>No</td><td>Equipos de volumen pequeño</td></tr>
+<tr><td>EPROM</td><td>Usuario</td><td>Luz UV, chip completo</td><td>No</td><td>Prototipos</td></tr>
+<tr><td>EEPROM</td><td>Eléctrica</td><td>Eléctrico, por byte</td><td>No</td><td>Prototipos y configuración</td></tr>
+<tr><td>Flash</td><td>Eléctrica</td><td>Eléctrico, por bloque</td><td>No</td><td>Cámara digital</td></tr>
+<tr><td>SRAM</td><td>Lectura/escritura</td><td>Eléctrico</td><td>Sí</td><td>Caché</td></tr>
+<tr><td>DRAM</td><td>Lectura/escritura, con refresco</td><td>Eléctrico</td><td>Sí</td><td>Memoria principal</td></tr>
+</tbody></table></div></div></section>
+
+<section class="s" id="mit"><svg class="ghost" data-s=".1" viewBox="0 0 200 120"><path d="M20 100L60 20l40 80 40-80 40 80" fill="none" stroke="currentColor" stroke-width="3"/></svg><div class="w"><span class="t">Mitos y verdades</span><h2>¿Qué tanto recuerdas?</h2><p class="lead">Toca una tarjeta para ver la respuesta.</p><div class="g"><button class="fl" aria-pressed="false"><span class="fi"><span>¿Puedo corregir un error en una M-ROM?</span><span class="fk">No. Si el código está mal, se tira la memoria y se empieza de nuevo.</span></span></button><button class="fl" aria-pressed="false"><span class="fi"><span>¿Se puede reprogramar una PROM?</span><span class="fk">No. Un fusible roto no se reconecta. Para reprogramar existen la EPROM y la EEPROM.</span></span></button><button class="fl" aria-pressed="false"><span class="fi"><span>¿Qué pasa con los datos si se corta la luz?</span><span class="fk">Nada. Son memorias no volátiles y los conservan.</span></span></button><button class="fl" aria-pressed="false"><span class="fi"><span>¿Una PROM es tan resistente como una ROM?</span><span class="fk">No. Es más frágil: un poco de electricidad estática puede quemar sus fusibles.</span></span></button></div></div></section>
+<section class="s" id="fin2"><div class="w"><span class="t">Conclusión</span>
+<p class="big">La M-ROM se graba una vez en la fábrica. La PROM la graba el usuario. Las dos conservan sus datos sin energía.</p>
+<div class="demo" id="sim"><b>¿Cuál elijo? Toca tu caso</b><div class="row" id="sb2"><button>Prototipo que aún cambia</button><button>Pocas unidades</button><button>Miles de unidades</button></div><div class="g" style="align-items:center"><svg viewBox="0 0 400 210" role="img" aria-label="Costo total contra unidades fabricadas para M-ROM y PROM"><path d="M30 10V190H390" fill="none" style="stroke:var(--line);stroke-width:2"/><path d="M40 70L380 62" style="stroke:var(--acc2);stroke-width:4;fill:none"/><path d="M40 190L380 15" style="stroke:var(--gold);stroke-width:4;fill:none"/><text x="300" y="52" class="sv" style="fill:var(--acc2)">M-ROM</text><text x="250" y="30" class="sv" style="fill:var(--acc)">PROM</text><text x="36" y="206" class="sv" style="font-size:13px">Unidades fabricadas</text><text x="36" y="24" class="sv" style="font-size:13px">Costo total</text><circle id="mk2" r="9" cx="120" cy="149" style="fill:#e86a2a;transition:.5s"/></svg><p id="sr" class="lead" style="margin:0"></p></div><p class="val">Ilustración conceptual, sin cifras reales.</p></div>
+<div class="pc"><div class="c"><h3>Elige M-ROM cuando</h3><p>Vas a fabricar miles de unidades con un código ya probado.</p></div>
+<div class="c"><h3>Elige PROM cuando</h3><p>Necesitas pocas unidades y quieres programarlas tú.</p></div></div>
+</div></section>
+
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+// pines del chip
+$('#pn').innerHTML=[0,1,2,3,4,5,6].map(i=>{const y=44+i*28;return`<rect x="14" y="${y}" width="40" height="12" rx="2"/><rect x="346" y="${y}" width="40" height="12" rx="2"/>`}).join('');
+// bits flotantes
+const bt=$('#bits');for(let i=0;i<18;i++){const e=document.createElement('i');e.textContent=Array.from({length:14},(_,k)=>(i*7+k*3)%5<2?1:0).join(' ');e.style.left=(i*5.6+2)+'%';e.style.top=((i*37)%60)+'%';e.dataset.h=40+(i%5)*70;e.style.setProperty('--d',(9+i%6*2)+'s');e.style.animationDelay=-(i*1.3)+'s';bt.append(e)}
+// demo energía
+const B='10110010';let on=true;
+const fill=(id,off)=>{$(id).innerHTML=[...B].map(b=>`<span class="${off?'off':''}">${off?'·':b}</span>`).join('')};
+fill('#rb',false);fill('#ob',false);
+$('#pw').onclick=e=>{on=!on;fill('#rb',!on);e.target.textContent=on?'Cortar energía':'Restaurar energía';e.target.setAttribute('aria-pressed',on)};
+// máscara
+$('#mk').innerHTML=['10110010','01101001','11100001','00011110'].join('').split('').map(b=>`<div class="${b==1?'m1':''}"><span>${b}</span></div>`).join('');
+// PROM
+const fg=$('#fg');
+function build(){fg.innerHTML='';for(let r=0;r<4;r++){const d=document.createElement('div');d.className='fr';const v=document.createElement('span');v.className='val';v.textContent='11111111';for(let c=0;c<8;c++){const b=document.createElement('button');b.className='f';b.textContent='1';b.setAttribute('aria-label',`Fusible fila ${r+1}, bit ${c+1}`);b.onclick=()=>{if(b.classList.contains('x'))return;b.classList.add('x');b.textContent='0';v.textContent=[...d.querySelectorAll('.f')].map(x=>x.textContent).join('')};d.append(b)}d.append(v);fg.append(d)}}
+build();$('#rs').onclick=build;
+setInterval(()=>{if(rm)return;const e=bt.children[Math.random()*18|0],a=e.textContent.split(' '),k=Math.random()*a.length|0;a[k]=a[k]==='0'?'1':'0';e.textContent=a.join(' ')},90);
+const NV=[['hero','Inicio'],['def','Definición'],['mrom','M-ROM'],['prom','PROM'],['uso','Usos'],['cmp','Comparación'],['fin2','Conclusión']];
+$('#nv').innerHTML=NV.map(([id,n])=>`<a href="#${id}" title="${n}" aria-label="${n}"></a>`).join('');
+const IC={def:['<rect x="10" y="22" width="28" height="18" rx="3"/><path d="M16 22v-6a8 8 0 0116 0v6"/>','<path d="M10 38l4-12 18-18 8 8-18 18zM6 6l36 36"/>','<path d="M8 8h32v32H8zM8 19h32M8 29h32M19 8v32M29 8v32"/>'],mrom:['<path d="M8 14h32M8 24h20M8 34h26"/>','<path d="M10 25l9 9 19-20"/>','<path d="M24 8l18 32H6zM24 20v9M24 34v1"/>'],prom:['<path d="M6 24h10l4-10 8 20 4-10h10"/>','<path d="M26 6L10 28h12l-2 14 18-24H26z"/>','<path d="M12 18l10-10M12 18l10 10M12 18h20a8 8 0 010 16H20"/>'],uso:['<circle cx="24" cy="24" r="14"/><path d="M24 14v10"/>','<rect x="10" y="8" width="28" height="32" rx="4"/><circle cx="24" cy="26" r="8"/><path d="M15 13h6"/>','<rect x="8" y="10" width="32" height="28"/><path d="M8 20h32M8 29h32M20 10v28"/>','<rect x="14" y="14" width="20" height="20"/><path d="M20 8v6M28 8v6M20 34v6M28 34v6M8 20h6M8 28h6M34 20h6M34 28h6"/>','<path d="M24 8l16 8-16 8-16-8zM8 24l16 8 16-8M8 32l16 8 16-8"/>','<path d="M6 24h10l4-10 8 20 4-10h10"/>']};
+Object.entries(IC).forEach(([id,a])=>$$('#'+id+' .c').forEach((c,i)=>c.insertAdjacentHTML('afterbegin',`<svg viewBox="0 0 48 48" width="44" height="44" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" style="color:var(--acc2);margin-bottom:.6rem">${a[i]}</svg>`)));
+function sp(el,vh){const r=el.getBoundingClientRect();return Math.min(1,Math.max(0,-r.top/(r.height-vh)))}
+let act=0;
+function scenes2(vh){
+ const p=sp($('#ex'),vh),s=Math.min(1,p/.22),a=p<.25?-1:Math.min(3,Math.floor((p-.25)/.75*4));
+ $('#exb').style.transform=`rotateX(${55-8*s}deg) rotateZ(${-30-12*s}deg) scale(${.92+.12*s})`;
+ $$('#ex .ly').forEach((l,i)=>{l.style.transform=`translateZ(${(1.5-i)*s*140}px)`;l.classList.toggle('on',i===a);l.style.opacity=a<0||i===a?1:.4});
+ $$('#exl li').forEach((li,i)=>li.classList.toggle('on',i===a));
+ $('#exh').style.opacity=a<0?1:0;
+ const q=sp($('#fs'),vh),st=q<.14?0:q<.34?1:q<.6?2:q<.74?3:4,br=q>=.6,f=$('#fz'),h=Math.max(0,Math.min(1,(q-.34)/.26));
+ const T=['<b>Fusible intacto.</b> En cada cruce de fila y columna hay un fusible que las conecta. Una PROM nueva (blank) tiene todas sus celdas en 1.','<b>La celda vale 1.</b> Mientras el fusible esté entero, fila y columna siguen conectadas.','<b>El programador entra en acción.</b> Para escribir un 0 envía un pulso de alto voltaje, de 10 a 30 V, por una terminal dedicada, y el fusible se calienta.','<b>¡Se quema el fusible!</b> El alto voltaje rompe la conexión entre fila y columna. A esto se le llama "quemar la PROM".','<b>Ahora la celda vale 0 y ya no cambia.</b> Una PROM se programa una sola vez. Además, un poco de electricidad estática puede quemar fusibles por accidente.'];
+ f.style.stroke=st===0?'var(--mut)':`color-mix(in srgb,#e86a2a ${h*100}%,#e3b341)`;f.style.strokeDasharray=st===0?'6 6':'none';f.style.opacity=br?0:1;f.style.strokeWidth=6+h*3;
+ f.style.transform=st===2?`translate(${Math.sin(q*500)*h*3}px,0)`:'none';
+ const c=$('#cur');c.style.opacity=st===1||st===2?1:0;c.style.strokeDashoffset=-q*900;c.style.strokeWidth=4+h*6;
+ const fb=$('#fb'),d=Math.min(1,Math.max(0,(q-.6)/.15))*16;fb.style.opacity=br?1:0;fb.children[0].style.transform=`translateX(${-d}px)`;fb.children[1].style.transform=`translateX(${d}px)`;
+ $('#sk').style.opacity=st===3?1:0;$('#vt').style.opacity=st===2?1:0;$('#vn').textContent=br?'0':'1';
+ $('#fc').innerHTML=T[st];$$('#fdt i').forEach((e,i)=>e.classList.toggle('on',i<=st));
+ const tr=$('#tr').getBoundingClientRect(),tt=Math.min(1,Math.max(0,(vh*.9-tr.top)/(vh*.7))),vv=e=>Math.min(1,Math.max(0,(tt-e.dataset.k*.1)/.15));
+ $$('#tr .tl').forEach(e=>e.style.strokeDashoffset=1-vv(e));
+ $$('#tr .tn').forEach(e=>{const v=vv(e);e.style.opacity=v;e.style.transform=`translateY(${(1-v)*14}px)`});
+}
+function scenes(y,vh){
+ const p=rm?.7:sp($('#ex'),vh),a=Math.min(3,Math.floor(p*4.4));
+ $('#exb').style.transform=`rotateX(${62-12*p}deg) rotateZ(${-40+22*p}deg)`;
+ $$('#ex .ly').forEach((l,i)=>{l.style.transform=`translateZ(${(1.5-i)*(.15+p)*95}px)`;const on=p>.05&&i===a;l.classList.toggle('on',on);l.style.opacity=p<.05||on?1:.5});
+ $$('#exl li').forEach((li,i)=>li.classList.toggle('on',p>.05&&i===a));
+ const q=rm?.8:sp($('#fs'),vh),lit=q>.18,br=q>.62,f=$('#fz');
+ f.style.stroke=lit?'var(--gold)':'var(--mut)';f.style.strokeDasharray=lit?'none':'6 6';f.style.opacity=br?0:1;
+ $('#fb').style.opacity=br?1:0;$('#cur').style.opacity=lit&&!br?1:0;$('#cur').style.strokeDashoffset=-q*700;
+ $('#sk').style.opacity=br&&q<.82?1:0;$('#vt').style.opacity=q>.4&&q<.82?1:0;$('#vn').textContent=br?'0':'1';
+ $('#fc').textContent=['Fusible intacto: la celda guarda un 1.','La corriente pasa y el programador envía un pulso de alto voltaje.','Fusible roto: la celda guarda un 0, para siempre.'][br?2:lit?1:0];
+ $$('.mq b').forEach((e,i)=>{const r=e.parentElement.getBoundingClientRect();e.style.transform=`translateX(${(r.top-vh/2)*(i?-.8:.8)}px)`});
+ $$('.g').forEach(g=>{const r=g.getBoundingClientRect(),m=r.top+r.height/2-vh/2;[...g.children].forEach((c,i)=>c.style.transform=`translateY(${m*(i%3)*.05}px)`)});
+ ['hero','def','mrom','prom','uso','cmp','fin2'].forEach((id,i)=>{const r=$('#'+id).getBoundingClientRect();if(r.top<vh/2&&r.bottom>vh/2)act=i});
+ $$('#nv a').forEach((n,i)=>n.classList.toggle('on',i===act));
+}
+const D='M-ROM OK',bin=c=>c.charCodeAt(0).toString(2).padStart(8,'0');let ad=[0,0,0];
+$('#rw').innerHTML=[...D].map((c,i)=>`<div class="rr"><i>${i.toString(2).padStart(3,'0')}</i><span>${bin(c)}</span><em>${c===' '?'␣':c}</em></div>`).join('');
+$('#sw').innerHTML=['A2','A1','A0'].map((n,i)=>`<span style="text-align:center;font:600 12px monospace;color:var(--mut)">${n}<br><button class="sb" data-i="${i}" aria-label="Línea ${n}">0</button></span>`).join('');
+function rd(){const n=ad[0]*4+ad[1]*2+ad[2];$$('.rr').forEach((r,i)=>r.classList.toggle('on',i===n));$('#ro').innerHTML=[...bin(D[n])].map(b=>`<span>${b}</span>`).join('')+`<span style="width:auto;padding:0 10px">${D[n]===' '?'␣':D[n]}</span>`}
+$$('.sb').forEach(b=>b.onclick=()=>{const i=+b.dataset.i;ad[i]^=1;b.textContent=ad[i];b.classList.toggle('on',ad[i]===1);rd()});rd();
+$$('.fl').forEach(b=>b.onclick=()=>b.setAttribute('aria-pressed',b.getAttribute('aria-pressed')!=='true'));
+const TN=[[410,28,210,'Memoria principal',0],[200,108,170,'RAM (volátil)',2],[620,108,190,'ROM (no volátil)',2],[110,188,170,'Estática (SRAM)',4],[290,188,170,'Dinámica (DRAM)',4],[500,188,150,'Borrables',4],[730,188,170,'Permanentes',4,1],[500,268,230,'EPROM · EEPROM · Flash',6],[730,268,170,'M-ROM · PROM',6,1]],TL=[[410,48,200,88,1],[410,48,620,88,1],[200,128,110,168,3],[200,128,290,168,3],[620,128,500,168,3],[620,128,730,168,3],[500,208,500,248,5],[730,208,730,248,5]];
+$('#tr').innerHTML=TL.map(([a,b,c,d,k])=>`<path class="tl" data-k="${k}" pathLength="1" d="M${a} ${b}L${c} ${d}" style="stroke:var(--mut);stroke-width:2;fill:none;stroke-dasharray:1;stroke-dashoffset:1"/>`).join('')+TN.map(([x,y,w,t,k,h])=>`<g class="tn" data-k="${k}" style="opacity:0"><rect x="${x-w/2}" y="${y-20}" width="${w}" height="40" rx="10" style="fill:var(--card);stroke:${h?'var(--gold)':'var(--line)'};stroke-width:${h?3:2}"/><text x="${x}" y="${y+6}" text-anchor="middle" class="sv" style="fill:${h?'var(--acc)':'var(--fg)'}">${t}</text></g>`).join('');
+const RS=[['<b>EPROM o EEPROM.</b> Si el código aún cambia, conviene una memoria que se pueda borrar. Esas ya no son permanentes.',null],['<b>PROM.</b> Pocas unidades y código final: la programas tú una sola vez con un programador.',[120,149]],['<b>M-ROM.</b> Preparar la máscara cuesta, pero cada unidad sale en céntimos si fabricas miles.',[350,63]]];
+function pick(i){$$('#sb2 button').forEach((b,j)=>b.classList.toggle('sel',i===j));$('#sr').innerHTML=RS[i][0];const m=$('#mk2'),p=RS[i][1];m.style.opacity=p?1:0;if(p){m.style.cx=p[0]+'px';m.style.cy=p[1]+'px'}}
+$$('#sb2 button').forEach((b,j)=>b.onclick=()=>pick(j));pick(1);
+// scroll
+const rm=matchMedia('(prefers-reduced-motion:reduce)').matches;
+function tick(){const y=scrollY,vh=innerHeight,h=$('#hero'),p=Math.min(1,Math.max(0,y/(h.offsetHeight-vh)));
+ $('#bar').style.transform=`scaleX(${y/(document.documentElement.scrollHeight-vh)})`;
+ if(y<h.offsetHeight){
+  $('#chip').style.transform=`rotateX(${64*(1-p)}deg) rotateZ(${-42*(1-p)}deg) scale(${.62+.55*p})`;
+  $$('#bits i').forEach(e=>e.style.transform=`translateY(${-p*e.dataset.h}px)`);
+  $('#hint').style.opacity=1-Math.min(1,p*6);$('#fin').style.opacity=Math.max(0,(p-.7)*3.3);
+ }
+ scenes(y,vh);scenes2(vh);$$('.ghost').forEach(e=>{const r=e.parentElement.getBoundingClientRect();e.style.transform=`translateY(${(r.top+r.height/2-vh/2)*e.dataset.s}px)`});
+}
+addEventListener('scroll',()=>requestAnimationFrame(tick),{passive:true});addEventListener('resize',tick);tick();
+</script>
+</body></html>
